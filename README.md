@@ -1,4 +1,4 @@
-# Projet de TMI
+# Projet de l'Environnement Informatique
 
 Auteur : _VOROTNIKOV Nikolai_
 
