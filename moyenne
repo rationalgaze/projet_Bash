@@ -1,0 +1,5 @@
+#! /bin/bash
+#script qui affiche la moyenne de 4 parametres entree
+
+s=`./somme $1 $2 $3 $4`
+echo $s\/4|bc -l

@@ -1,0 +1,49 @@
+Le script meteo et autres fonctionnent bien.
+J'ai testé qq fois, l'information donnée par le script est correcte.
+
+
+[rationalgaze]~/Env_Info/projet $ ./meteo
+Meteo du jour
+Temperature moyenne :  12.4 °C
+Vent moyen :  10.2 km/h
+[rationalgaze]~/Env_Info/projet $ ./meteo 20140404
+Meteo du 20140404
+Temperature moyenne : 12.2 °C
+Vent moyen : 18.6 km/h
+[rationalgaze]~/Env_Info/projet $ ./meteo 20140404 5
+Moyenne meteo sur 5 jours a partir du 20140404
+Temperature moyenne :  11.28000000000000000000 °C
+Vent moyen :  22.44000000000000000000 km/h
+
+J'avais un seul point de blocage c'etait bien extraire les chiffres d'un tag HTML. (./extraire_temp, _vent)
+D'abord j'ai écrit comme ça :
+
+#grep td ./temp/$1|sed -n '5p;5q'|cut -c 17-20
+
+mais j'ai compris que si la quantité de chiffres changera je recevrai les espaces
+à la fin de la ligne de la sortie.
+
+J'ai trouvé une autre solution avec le script sed :
+
+grep td ./temp/$1|sed -n '5p;5q'|sed 's/[ a-z<>/°C="%]//g'|cut -c 3-
+
+au niveau du script extraire_temp et _vent c'était bon, mais dans le script meteo
+j'ai reçu :
+
+[rationalgaze]~/Env_Info/projet $ ./meteo
+Meteo du jour
+ °Cperature moyenne :  12.8
+ km/hmoyen :  10.4
+
+les indices ont changé sa place.
+
+Je n'ai pas compris pourquoi ca se passe comme ca, mais au final j'ai trouvé la solution :
+
+grep td ./temp/$1|sed -n '5p;5q'|cut -c 17-|sed -e 's/.$//g;s/[°C<\/td>]//g'
+
+Encore un petit problème c'etait un espace (ou qqch autre) à la fin de ligne avec le tag qui contient la température moyenne.
+
+Temperature moyenne : 9.7� °C
+
+Ça prend du temps pour trouver où est cet espace et le effacer.
+

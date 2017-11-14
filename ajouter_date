@@ -1,0 +1,15 @@
+#! /bin/bash
+#script qui affiche un tableau de dates au format yyyymmdd en prenant 
+#en parametre une date au format yyyy-mm-dd et un nombre de jours a ajouter.
+
+#date -d "$1 + $2 days" +%Y%m%d
+
+declare -a tab
+a=$(($2-1))
+for i in `seq 0 $a`
+do
+	tab[i]=`date -d "$1 + $i days" +%Y%m%d`
+done
+
+echo ${tab[@]}
+

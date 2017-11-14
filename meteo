@@ -1,0 +1,64 @@
+#! /bin/bash
+
+#fonction get_http qui prend en parametre une date yyyy-mm-dd et enregistre la
+#page html dans un repertoire courante
+
+function get_http() {
+	DATE=`./ajouter_date $1 1`
+	wget -q -O ./temp/$DATE http://www.meteo-bretagne.fr/observations-station-meteo-Brest-Guipavas/$DATE
+}
+
+#MAIN PART
+
+#Creation d'un repertoire temporaire en cas d'absence
+if [[ !((-a "./temp/")) ]]
+then
+	mkdir ./temp
+fi
+
+#Programme principale
+#Prend 0,1 ou 2 parametres et selon le quantite des parametres donne les donnes meteos
+
+case $# in
+	1){
+		get_http $1
+		a=`./ajouter_date $1 1`
+		echo "Meteo du" $1
+		echo "Temperature moyenne : "`./extraire_temp $a` "°C"
+		echo "Vent moyen : "`./extraire_vent $a` "km/h"	
+	  };;
+	2){
+		declare -a tabTemp
+		declare -a tabVent		
+		for i in `seq 0 $(($2-1))`
+		do 						
+			z=`date -d "$1 + $i days" +%Y%m%d`
+			get_http $z
+			tabTemp[$i]=`./extraire_temp $z`
+			tabVent[$i]=`./extraire_vent $z`			
+		done
+
+		sTemp="0"
+		sVent="0"
+
+		for j in ${!tabTemp[@]}
+		do
+			sTemp=`echo $sTemp + ${tabTemp[$j]}|bc -l`
+			sVent=`echo $sVent + ${tabVent[$j]}|bc -l`
+		done
+		mTemp=`echo $sTemp\/$2|bc -l`
+		mVent=`echo $sVent\/$2|bc -l`
+		
+		echo "Moyenne meteo sur $2 jours a partir du" $1
+		echo "Temperature moyenne : " $mTemp "°C"
+		echo "Vent moyen : " $mVent "km/h"
+	  };;
+
+	*){
+		a=`date +%Y%m%d`
+		get_http $a
+		echo "Meteo du jour"
+		echo "Temperature moyenne : " `./extraire_temp $a` "°C"
+		echo "Vent moyen : " `./extraire_vent $a` "km/h"							
+	  };;
+esac 

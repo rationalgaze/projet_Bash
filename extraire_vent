@@ -1,0 +1,8 @@
+#! /bin/bash
+#Ce script extrait la temperature moyenne d'un fichier HTML
+#grep td ./temp/$1|sed -n '9p;9q'|sed -e 's/ km\/h<\/td>//'|cut -c 18-
+
+grep td ./temp/$1|sed -n '9p;9q'|cut -c 18-22|sed -e 's/ [a-z]*$//g'
+
+
+
